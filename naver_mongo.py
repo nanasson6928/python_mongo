@@ -34,3 +34,6 @@ for movie in movies:
         }
         db.movies.insert_one(doc)
         rank += 1
+
+
+#old_content > table > tbody > tr:nth-child(2) > td.title > div > a

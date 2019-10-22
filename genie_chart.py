@@ -1,31 +1,34 @@
+# --- Scraping 기본 세팅 ----------------------
 import requests
 from bs4 import BeautifulSoup
 
-from pymongo import MongoClient           # pymongo를 임포트 하기(패키지 인스톨 먼저 해야겠죠?)
-client = MongoClient('localhost', 27017)  # mongoDB는 27017 포트로 돌아갑니다.
-db = client.dbsparta
-
-# URL을 읽어서 HTML를 받아오고,
+# 타겟 URL을 읽어서 HTML를 받아오고,
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-data = requests.get('https://www.genie.co.kr/chart/top200?ditc=D&rtm=N&ymd=20190908')
+data = requests.get('https://www.genie.co.kr/chart/top200?ditc=D&ymd=20191019', headers=headers)
 
 # HTML을 BeautifulSoup이라는 라이브러리를 활용해 검색하기 용이한 상태로 만듦
+# soup이라는 변수에 "파싱 용이해진 html"이 담긴 상태가 됨
+# 이제 코딩을 통해 필요한 부분을 추출하면 된다.
+
 soup = BeautifulSoup(data.text, 'html.parser')
 
-# select를 이용해서, tr들을 불러오기
-musics = soup.select('#body-content > div.newest-list > div > table > tbody > tr')
+# ---------------------------------------------
 
-# musics (tr들의) 반복문 돌리기
+# selector를 이용해서 tr들을 불러오기 (table row = list)
+musics = soup.select('div.newest-list > div.music-list-wrap > table.list-wrap > tbody > tr.list')
+
 rank = 1
+# musics(list)의 반복문 돌리기
 for music in musics:
-    if a_tag is not None:
-        title = musics.find('td',{'class': 'info'}).find('a', {'class' : 'title.ellipsis'}).text
-        artist = musics.find('td', {'class' : 'info'}).find('a', {'class' : 'artist.ellipsis'}).text
+    # musics에서 'a'태그 내용 불러오기
+    a_tag = music.select_one('td > a.title')
 
-        doc = {
-            'rank' : rank,
-            'title' : title,
-            'artist' : artist
-        }
-        db.musics.insert_one(doc)
+    # 'a'태그가 없다면
+    if a_tag is not None:
+        # a의 text를 찍어본다.
+        title = a_tag.text
+        artist = music.select_one('td > a.artist').text
+        print(rank, title, artist)
         rank += 1
+
+
