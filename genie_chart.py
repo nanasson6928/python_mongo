@@ -30,5 +30,6 @@ for music in musics:
         artist = music.select_one('td > a.artist').text
         print(rank, title, artist)
         rank += 1
+    
 
 
