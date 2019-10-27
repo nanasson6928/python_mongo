@@ -15,21 +15,14 @@ soup = BeautifulSoup(data.text, 'html.parser')
 # ---------------------------------------------
 
 # selector를 이용해서 tr들을 불러오기 (table row = list)
-musics = soup.select('div.newest-list > div.music-list-wrap > table.list-wrap > tbody > tr.list')
+musics = soup.select('div.newest-list > div.music-list-wrap > table.list-wrap > tbody > tr')
 
 rank = 1
 # musics(list)의 반복문 돌리기
 for music in musics:
     # musics에서 'a'태그 내용 불러오기
-    a_tag = music.select_one('td > a.title')
-
-    # 'a'태그가 없다면
-    if a_tag is not None:
-        # a의 text를 찍어본다.
-        title = a_tag.text
-        artist = music.select_one('td > a.artist').text
-        print(rank, title, artist)
-        rank += 1
-    
-
-
+    a_tag = music.select_one('td.info > a')
+    title = music.select_one('td.info > a.title.ellipsis').text.strip()
+    artist = music.select_one('td.info > a.artist.ellipsis').text
+    # print(rank, title, artist)
+    rank += 1
